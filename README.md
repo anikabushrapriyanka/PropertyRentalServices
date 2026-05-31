@@ -1,0 +1,111 @@
+PropertyRentalServices - Windows Forms (.NET Framework 4.7.2)
+============================================================
+STEP-BY-STEP SETUP GUIDE
+============================================================
+PART 1: DATABASE SETUP (SSMS)
+Step 1 — Open SQL Server Management Studio (SSMS)
+Launch SSMS from Start Menu
+Connect to your SQL Server instance
+Server name examples: localhost, .\SQLEXPRESS, (local), DESKTOP-XXXXX\SQLEXPRESS
+Authentication: Windows Authentication (recommended) or SQL Server Authentication
+Step 2 — Run the SQL Script
+In SSMS, click File → Open → File
+Browse and open PropertyRentalDB.sql (included in this zip)
+Click Execute (or press F5)
+You should see: PropertyRentalDB created successfully!
+In Object Explorer, refresh and confirm PropertyRentalDB appears
+Step 3 — Note Your Server Name
+In SSMS Object Explorer, the top node shows your server name
+Examples: DESKTOP-ABC123\SQLEXPRESS or localhost
+Copy this — you will need it in Step 4
+PART 2: VISUAL STUDIO SETUP
+Step 4 — Update Connection String
+Open the project folder
+
+Open App.config in any text editor (Notepad, VS Code, etc.)
+
+Find this line:
+
+Data Source=YOUR_SERVER_NAME
+Replace YOUR_SERVER_NAME with your actual server name from Step 3
+
+Examples:
+
+<!-- For SQL Express -->
+Data Source=.\SQLEXPRESS;Initial Catalog=PropertyRentalDB;Integrated Security=True
+
+<!-- For default SQL Server instance -->
+Data Source=localhost;Initial Catalog=PropertyRentalDB;Integrated Security=True
+
+<!-- For named instance -->
+Data Source=DESKTOP-ABC123\SQLEXPRESS;Initial Catalog=PropertyRentalDB;Integrated Security=True
+Save App.config
+
+Step 5 — Open in Visual Studio
+Open Visual Studio 2019 or 2022
+Click File → Open → Project/Solution
+Navigate to the unzipped folder
+Select PropertyRentalServices.csproj
+Click Open
+Step 6 — Restore / Check References
+Visual Studio may prompt to restore references. If you see errors:
+
+Right-click the project in Solution Explorer → Properties
+Confirm Target Framework is .NET Framework 4.7.2
+Check that System.Data.SqlClient reference exists:
+Right-click References → Add Reference
+Check: System.Data, System.Data.SqlClient, System.Configuration
+Step 7 — Build & Run
+Press Ctrl+Shift+B to Build
+Press F5 to Run (or Ctrl+F5 without debugger)
+The Login screen will appear
+PART 3: LOGIN CREDENTIALS
+Role	Email	Password
+SuperAdmin	admin@rental.com	admin123
+Owner	john@owner.com	owner123
+Customer	alice@customer.com	cust123
+PART 4: USING THE APPLICATION
+As SuperAdmin:
+View all users, properties, bookings, reviews
+Delete low-rated owners (avg rating < 2.0)
+As Owner:
+Add/Edit/Delete your properties
+View earnings from confirmed bookings
+Add discount offers to properties
+As Customer:
+Browse & filter properties (price, location, bedrooms, status)
+Add properties to cart with check-in/check-out dates
+Confirm booking → Payment form
+Review properties after confirmed booking
+TROUBLESHOOTING
+Problem	Solution
+"Cannot connect to database"	Check server name in App.config
+"Database not found"	Re-run PropertyRentalDB.sql in SSMS
+Build errors on SqlClient	Add reference to System.Data.SqlClient
+Login fails	Make sure seed data was inserted (check Users table in SSMS)
+.NET version error	Install .NET Framework 4.7.2 Developer Pack
+PROJECT STRUCTURE
+PropertyRentalServices/
+├── App.config                    ← Connection string HERE
+├── Program.cs                    ← Entry point
+├── PropertyRentalServices.csproj ← Project file
+├── PropertyRentalDB.sql          ← Run in SSMS first
+├── Database/
+│   └── DBConnection.cs           ← DB helper class
+├── Models/
+│   └── SessionManager.cs         ← Logged-in user session
+└── Forms/
+    ├── LoginForm.cs
+    ├── RegisterForm.cs
+    ├── AdminDashboard.cs
+    ├── OwnerDashboard.cs
+    ├── CustomerDashboard.cs
+    ├── PaymentForm.cs
+    └── ReviewForm.cs             ← Includes ReviewViewForm
+DATABASE TABLES
+Users — UserId, Name, Email, Password, Role
+Property — PropertyId, OwnerId, Title, Location, Price, Bedrooms, Status, Description
+Booking — BookingId, PropertyId, CustomerId, StartDate, EndDate, TotalPrice, Status
+Payment — PaymentId, BookingId, Amount, PaymentDate, Method
+Review — ReviewId, PropertyId, UserId, Rating, Comment, ReviewDate
+Offer — OfferId, PropertyId, DiscountPercent, StartDate, EndDate, Description
